@@ -21,20 +21,22 @@ import android.widget.TextView;
 public class FloatLabelEditText
         extends LinearLayout {
 
-    private int mCurrentApiVersion = android.os.Build.VERSION.SDK_INT, mFocusedColor, mUnFocusedColor, mGravity;
+    protected int mCurrentApiVersion = android.os.Build.VERSION.SDK_INT, mFocusedColor, mUnFocusedColor, mGravity;
 
-    private EditText mEditTextView;
-    private TextView mFloatingLabel;
+    protected EditText mEditTextView;
+    protected TextView mFloatingLabel;
 
     // -----------------------------------------------------------------------
     // default constructors
 
     public FloatLabelEditText(Context context) {
-        this(context, null);
+        super(context);
+        initializeView(context, null, 0);
     }
 
     public FloatLabelEditText(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
+        initializeView(context, attrs, 0);
     }
 
     public FloatLabelEditText(Context context, AttributeSet attrs, int defStyle) {
@@ -66,7 +68,7 @@ public class FloatLabelEditText
     // -----------------------------------------------------------------------
     // private helpers
 
-    private void initializeView(Context context, AttributeSet attrs, int defStyle) {
+    protected void initializeView(Context context, AttributeSet attrs, int defStyle) {
 
         if (context == null) {
             return;
@@ -88,7 +90,7 @@ public class FloatLabelEditText
         setupEditTextView(context, attrs, defStyle);
     }
 
-    private void getAttributesFromXmlAndStoreLocally(Context context, AttributeSet attrs) {
+    protected void getAttributesFromXmlAndStoreLocally(Context context, AttributeSet attrs) {
         TypedArray attributesFromXmlLayout = context.obtainStyledAttributes(attrs,
                 R.styleable.FloatLabelEditText);
 
@@ -105,7 +107,7 @@ public class FloatLabelEditText
         attributesFromXmlLayout.recycle();
     }
 
-    private void setupEditTextView(Context context, AttributeSet attrs, int defStyle) {
+    protected void setupEditTextView(Context context, AttributeSet attrs, int defStyle) {
         mEditTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         mEditTextView.setId(0);
 
@@ -115,7 +117,7 @@ public class FloatLabelEditText
         }
     }
 
-    private void setupFloatingLabel(Context context, AttributeSet attrs, int defStyle) {
+    protected void setupFloatingLabel(Context context, AttributeSet attrs, int defStyle) {
         mFloatingLabel.setVisibility(View.INVISIBLE);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams.bottomMargin = -15;
@@ -123,7 +125,7 @@ public class FloatLabelEditText
 
         mFloatingLabel.setText(mEditTextView.getHint());
         mFloatingLabel.setTextColor(mUnFocusedColor);
-        mFloatingLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, mEditTextView.getTextSize() / 2.5f);
+        mFloatingLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, getScaledFontSize(mEditTextView.getTextSize()) / 1.3f);
         mFloatingLabel.setGravity(mGravity);
         mFloatingLabel.setPadding(mEditTextView.getPaddingLeft(), 0, 0, 0);
 
@@ -132,7 +134,7 @@ public class FloatLabelEditText
         }
     }
 
-    private TextWatcher getTextWatcher() {
+    protected TextWatcher getTextWatcher() {
         return new TextWatcher() {
 
             @Override
@@ -154,22 +156,24 @@ public class FloatLabelEditText
         };
     }
 
-    private void showFloatingLabel() {
+    protected void showFloatingLabel() {
         mFloatingLabel.setVisibility(VISIBLE);
         mFloatingLabel.startAnimation(AnimationUtils.loadAnimation(getContext(),
                 R.anim.weddingparty_floatlabel_slide_from_bottom));
     }
 
-    private void hideFloatingLabel() {
+    protected void hideFloatingLabel() {
         mFloatingLabel.setVisibility(INVISIBLE);
         mFloatingLabel.startAnimation(AnimationUtils.loadAnimation(getContext(),
                 R.anim.weddingparty_floatlabel_slide_to_bottom));
     }
 
-    private OnFocusChangeListener getFocusChangeListener() {
+    protected OnFocusChangeListener getFocusChangeListener() {
         return new OnFocusChangeListener() {
 
-            ValueAnimator mFocusToUnfocusAnimation,mUnfocusToFocusAnimation;
+            ValueAnimator mFocusToUnfocusAnimation
+                    ,
+                    mUnfocusToFocusAnimation;
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -201,7 +205,7 @@ public class FloatLabelEditText
         };
     }
 
-    private ValueAnimator getFocusAnimation(int fromColor, int toColor) {
+    protected ValueAnimator getFocusAnimation(int fromColor, int toColor) {
         ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(),
                 fromColor,
                 toColor);
@@ -215,8 +219,13 @@ public class FloatLabelEditText
         return colorAnimation;
     }
 
-    private Editable getEditTextString() {
+    protected Editable getEditTextString() {
         return mEditTextView.getText();
+    }
+
+    protected float getScaledFontSize(float fontSizeFromAttributes) {
+        float scaledDensity = getContext().getResources().getDisplayMetrics().scaledDensity;
+        return fontSizeFromAttributes / scaledDensity;
     }
 
 }
