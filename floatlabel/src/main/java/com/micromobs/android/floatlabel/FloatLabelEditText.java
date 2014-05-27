@@ -110,6 +110,7 @@ public class FloatLabelEditText
     protected void setupEditTextView(Context context, AttributeSet attrs, int defStyle) {
         mEditTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         mEditTextView.setId(0);
+        mEditTextView.setVisibility(View.VISIBLE);
 
         mEditTextView.addTextChangedListener(getTextWatcher());
         if (mCurrentApiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -171,9 +172,7 @@ public class FloatLabelEditText
     protected OnFocusChangeListener getFocusChangeListener() {
         return new OnFocusChangeListener() {
 
-            ValueAnimator mFocusToUnfocusAnimation
-                    ,
-                    mUnfocusToFocusAnimation;
+            ValueAnimator mFocusToUnfocusAnimation,mUnfocusToFocusAnimation;
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
