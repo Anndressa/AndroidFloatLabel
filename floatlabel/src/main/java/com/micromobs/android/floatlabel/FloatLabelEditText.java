@@ -6,9 +6,12 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -172,7 +175,9 @@ public class FloatLabelEditText
     protected OnFocusChangeListener getFocusChangeListener() {
         return new OnFocusChangeListener() {
 
-            ValueAnimator mFocusToUnfocusAnimation,mUnfocusToFocusAnimation;
+            ValueAnimator mFocusToUnfocusAnimation
+                    ,
+                    mUnfocusToFocusAnimation;
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -227,4 +232,73 @@ public class FloatLabelEditText
         return fontSizeFromAttributes / scaledDensity;
     }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        return new SavedState(super.onSaveInstanceState(), mEditTextView.onSaveInstanceState(), mFloatingLabel.onSaveInstanceState());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        mEditTextView.onRestoreInstanceState(savedState.getEditTextViewState());
+        mFloatingLabel.onRestoreInstanceState(savedState.getFloatingLabelState());
+    }
+
+    @Override
+    protected void dispatchSaveInstanceState(SparseArray<Parcelable> container) {
+        super.dispatchFreezeSelfOnly(container);
+    }
+
+    @Override
+    protected void dispatchRestoreInstanceState(SparseArray<Parcelable> container) {
+        super.dispatchThawSelfOnly(container);
+    }
+
+
+    protected static class SavedState extends BaseSavedState {
+        private Parcelable mEditTextViewState;
+        private Parcelable mFloatingLabelState;
+
+        public SavedState(Parcelable superState, Parcelable mEditTextViewState, Parcelable mFloatingLabelState) {
+            super(superState);
+            this.mEditTextViewState = mEditTextViewState;
+            this.mFloatingLabelState = mFloatingLabelState;
+        }
+
+
+        private SavedState(Parcel in) {
+            super(in);
+            this.mEditTextViewState = in.readParcelable(TextView.SavedState.class.getClassLoader());
+            this.mFloatingLabelState = in.readParcelable(TextView.SavedState.class.getClassLoader());
+        }
+
+        public Parcelable getEditTextViewState() {
+            return mEditTextViewState;
+        }
+
+        public Parcelable getFloatingLabelState() {
+            return mFloatingLabelState;
+        }
+
+        @Override
+        public void writeToParcel(Parcel destination, int flags) {
+            super.writeToParcel(destination, flags);
+            destination.writeParcelable(this.mEditTextViewState, flags);
+            destination.writeParcelable(this.mFloatingLabelState, flags);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
+
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+
+        };
+
+    }
 }
