@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:20.+'
 
     provided 'com.jakewharton.espresso:espresso:1.1-r2'
     androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r2'
@@ -18,7 +18,7 @@ dependencies {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19"
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         minSdkVersion 8
